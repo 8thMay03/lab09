@@ -215,176 +215,125 @@ def human_review_node(state: AgentState) -> AgentState:
 
 
 # ─────────────────────────────────────────────
-# 4. Human Review Node — HITL placeholder
+# 4. Worker nodes (gọi workers thật)
 # ─────────────────────────────────────────────
-
-def human_review_node(state: AgentState) -> AgentState:
-    """
-    HITL node: pause và chờ human approval.
-    Trong lab này, implement dưới dạng placeholder (in ra warning).
-
-    TODO Sprint 3 (optional): Implement actual HITL với interrupt_before hoặc
-    breakpoint nếu dùng LangGraph.
-    """
-    state["hitl_triggered"] = True
-    state["history"].append("[human_review] HITL triggered — awaiting human input")
-    state["workers_called"].append("human_review")
-
-    # Placeholder: tự động approve để pipeline tiếp tục
-    print(f"\n⚠️  HITL TRIGGERED")
-    print(f"   Task: {state['task']}")
-    print(f"   Reason: {state['route_reason']}")
-    print(f"   Action: Auto-approving in lab mode (set hitl_triggered=True)\n")
-
-    # Sau khi human approve, route về retrieval để lấy evidence
-    state["supervisor_route"] = "retrieval_worker"
-    state["route_reason"] += " | human approved → retrieval"
-
-    return state
-
-
-# ─────────────────────────────────────────────
-# 5. Import Workers
-# ─────────────────────────────────────────────
-
-# TODO Sprint 2: Uncomment sau khi implement workers
-# from workers.retrieval import run as retrieval_run
-# from workers.policy_tool import run as policy_tool_run
-# from workers.synthesis import run as synthesis_run
 
 
 def retrieval_worker_node(state: AgentState) -> AgentState:
-    """Wrapper gọi retrieval worker."""
-    # TODO Sprint 2: Thay bằng retrieval_run(state)
-    state["workers_called"].append("retrieval_worker")
-    state["history"].append("[retrieval_worker] called")
-
-    # Placeholder output để test graph chạy được
-    state["retrieved_chunks"] = [
-        {"text": "SLA P1: phản hồi 15 phút, xử lý 4 giờ.", "source": "sla_p1_2026.txt", "score": 0.92}
-    ]
-    state["retrieved_sources"] = ["sla_p1_2026.txt"]
-    state["history"].append(f"[retrieval_worker] retrieved {len(state['retrieved_chunks'])} chunks")
-    return state
+    return retrieval_run(state)
 
 
 def policy_tool_worker_node(state: AgentState) -> AgentState:
-    """Wrapper gọi policy/tool worker."""
-    # TODO Sprint 2: Thay bằng policy_tool_run(state)
-    state["workers_called"].append("policy_tool_worker")
-    state["history"].append("[policy_tool_worker] called")
-
-    # Placeholder output
-    state["policy_result"] = {
-        "policy_applies": True,
-        "policy_name": "refund_policy_v4",
-        "exceptions_found": [],
-        "source": "policy_refund_v4.txt",
-    }
-    state["history"].append("[policy_tool_worker] policy check complete")
-    return state
+    return policy_tool_run(state)
 
 
 def synthesis_worker_node(state: AgentState) -> AgentState:
-    """Wrapper gọi synthesis worker."""
-    # TODO Sprint 2: Thay bằng synthesis_run(state)
-    state["workers_called"].append("synthesis_worker")
-    state["history"].append("[synthesis_worker] called")
+    return synthesis_run(state)
 
-    # Placeholder output
-    chunks = state.get("retrieved_chunks", [])
-    sources = state.get("retrieved_sources", [])
-    state["final_answer"] = f"[PLACEHOLDER] Câu trả lời được tổng hợp từ {len(chunks)} chunks."
-    state["sources"] = sources
-    state["confidence"] = 0.75
-    state["history"].append(f"[synthesis_worker] answer generated, confidence={state['confidence']}")
-    return state
+
+def _merge_worker_io_logs(state: AgentState) -> None:
+    """Gom worker_io_logs từ các worker con (nếu có)."""
+    # Workers append vào state["worker_io_logs"] — đã dùng cùng key trong workers
+    pass
 
 
 # ─────────────────────────────────────────────
-# 6. Build Graph
+# 5. Graph
 # ─────────────────────────────────────────────
+
 
 def build_graph():
-    """
-    Xây dựng graph với supervisor-worker pattern.
-
-    Option A (đơn giản — Python thuần): Dùng if/else, không cần LangGraph.
-    Option B (nâng cao): Dùng LangGraph StateGraph với conditional edges.
-
-    Lab này implement Option A theo mặc định.
-    TODO Sprint 1: Có thể chuyển sang LangGraph nếu muốn.
-    """
-    # Option A: Simple Python orchestrator
     def run(state: AgentState) -> AgentState:
         import time
+
         start = time.time()
 
-        # Step 1: Supervisor decides route
         state = supervisor_node(state)
-
-        # Step 2: Route to appropriate worker
         route = route_decision(state)
 
         if route == "human_review":
             state = human_review_node(state)
-            # After human approval, continue with retrieval
             state = retrieval_worker_node(state)
         elif route == "policy_tool_worker":
             state = policy_tool_worker_node(state)
-            # Policy worker may need retrieval context first
-            if not state["retrieved_chunks"]:
+            if not state.get("retrieved_chunks"):
                 state = retrieval_worker_node(state)
         else:
-            # Default: retrieval_worker
             state = retrieval_worker_node(state)
 
-        # Step 3: Always synthesize
         state = synthesis_worker_node(state)
 
         state["latency_ms"] = int((time.time() - start) * 1000)
         state["history"].append(f"[graph] completed in {state['latency_ms']}ms")
+        _merge_worker_io_logs(state)
         return state
 
     return run
 
 
-# ─────────────────────────────────────────────
-# 7. Public API
-# ─────────────────────────────────────────────
-
 _graph = build_graph()
 
 
 def run_graph(task: str) -> AgentState:
-    """
-    Entry point: nhận câu hỏi, trả về AgentState với full trace.
-
-    Args:
-        task: Câu hỏi từ user
-
-    Returns:
-        AgentState với final_answer, trace, routing info, v.v.
-    """
     state = make_initial_state(task)
-    result = _graph(state)
-    return result
+    return _graph(state)
+
+
+def build_trace_record(state: AgentState) -> dict[str, Any]:
+    """
+    Định dạng trace bắt buộc (README Sprint 4).
+    """
+    mcp_raw = state.get("mcp_tools_used") or []
+    mcp_names: list[str] = []
+    for item in mcp_raw:
+        if isinstance(item, dict) and item.get("tool"):
+            mcp_names.append(str(item["tool"]))
+        elif isinstance(item, str):
+            mcp_names.append(item)
+
+    return {
+        "run_id": state.get("run_id", ""),
+        "task": state.get("task", ""),
+        "supervisor_route": state.get("supervisor_route", ""),
+        "route_reason": state.get("route_reason", ""),
+        "workers_called": state.get("workers_called", []),
+        "mcp_tools_used": mcp_names,
+        "mcp_tool_calls": mcp_raw,
+        "retrieved_sources": state.get("retrieved_sources", []),
+        "final_answer": state.get("final_answer", ""),
+        "confidence": state.get("confidence", 0.0),
+        "hitl_triggered": state.get("hitl_triggered", False),
+        "latency_ms": state.get("latency_ms"),
+        "timestamp": datetime.now().isoformat(),
+    }
 
 
 def save_trace(state: AgentState, output_dir: str = "./artifacts/traces") -> str:
-    """Lưu trace ra file JSON."""
+    """Lưu trace: bản chuẩn README + full state để debug."""
     os.makedirs(output_dir, exist_ok=True)
+    slim = build_trace_record(state)
+    full = {
+        **slim,
+        "history": state.get("history", []),
+        "retrieved_chunks": state.get("retrieved_chunks", []),
+        "policy_result": state.get("policy_result", {}),
+        "sources": state.get("sources", []),
+        "risk_high": state.get("risk_high", False),
+        "needs_tool": state.get("needs_tool", False),
+        "worker_io_logs": state.get("worker_io_logs", []),
+    }
     filename = f"{output_dir}/{state['run_id']}.json"
     with open(filename, "w", encoding="utf-8") as f:
-        json.dump(state, f, ensure_ascii=False, indent=2)
+        json.dump(full, f, ensure_ascii=False, indent=2)
     return filename
 
 
-# ─────────────────────────────────────────────
-# 8. Manual Test
-# ─────────────────────────────────────────────
-
 if __name__ == "__main__":
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
     print("=" * 60)
     print("Day 09 Lab — Supervisor-Worker Graph")
     print("=" * 60)
@@ -396,17 +345,17 @@ if __name__ == "__main__":
     ]
 
     for query in test_queries:
-        print(f"\n▶ Query: {query}")
+        print(f"\n>> Query: {query}")
         result = run_graph(query)
         print(f"  Route   : {result['supervisor_route']}")
         print(f"  Reason  : {result['route_reason']}")
         print(f"  Workers : {result['workers_called']}")
-        print(f"  Answer  : {result['final_answer'][:100]}...")
+        ans = result.get("final_answer") or ""
+        print(f"  Answer  : {ans[:200]}{'...' if len(ans) > 200 else ''}")
         print(f"  Confidence: {result['confidence']}")
         print(f"  Latency : {result['latency_ms']}ms")
 
-        # Lưu trace
         trace_file = save_trace(result)
         print(f"  Trace saved → {trace_file}")
 
-    print("\n✅ graph.py test complete. Implement TODO sections in Sprint 1 & 2.")
+    print("\n[OK] graph.py test complete.")
