@@ -191,12 +191,14 @@ def run(state: dict) -> dict:
     # Ghi worker IO vào state để trace
     state.setdefault("worker_io_logs", []).append(worker_io)
 
+
     return state
 
 
 # ─────────────────────────────────────────────
 # Test độc lập
 # ─────────────────────────────────────────────
+
 
 if __name__ == "__main__":
     print("=" * 50)
@@ -219,3 +221,4 @@ if __name__ == "__main__":
         print(f"  Sources: {result.get('retrieved_sources', [])}")
 
     print("\n✅ retrieval_worker test done.")
+
