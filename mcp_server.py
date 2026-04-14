@@ -140,30 +140,59 @@ def tool_search_kb(query: str, top_k: int = 3) -> dict:
     Hiện tại: Delegate sang retrieval worker.
     """
     try:
-        # Tái dùng retrieval logic từ workers/retrieval.py
-        import sys
-        sys.path.insert(0, os.path.dirname(__file__))
-        from workers.retrieval import retrieve_dense
-        chunks = retrieve_dense(query, top_k=top_k)
-        sources = list({c["source"] for c in chunks})
+        # Try ChromaDB first
+        from chromadb import Client
+        from chromadb.config import Settings
+
+        client = Client(Settings(persist_directory="./chroma_db"))
+        collection = client.get_collection(name="kb_collection")
+
+        results = collection.query(
+            query_texts=[query],
+            n_results=top_k
+        )
+
+        chunks = []
+        for i in range(len(results["documents"][0])):
+            chunks.append({
+                "text": results["documents"][0][i],
+                "source": results["metadatas"][0][i].get("source", "chroma"),
+                "score": results["distances"][0][i],
+            })
+
         return {
             "chunks": chunks,
-            "sources": sources,
+            "sources": list({c["source"] for c in chunks}),
             "total_found": len(chunks),
         }
     except Exception as e:
-        # Fallback: return mock data nếu ChromaDB chưa setup
-        return {
-            "chunks": [
-                {
-                    "text": f"[MOCK] Không thể query ChromaDB: {e}. Kết quả giả lập.",
-                    "source": "mock_data",
-                    "score": 0.5,
-                }
-            ],
-            "sources": ["mock_data"],
-            "total_found": 1,
-        }
+        print(f"Error occurred while querying ChromaDB: {e}")
+        # Fallback → existing retrieval worker
+        try:
+            # Tái dùng retrieval logic từ workers/retrieval.py
+            import sys
+            sys.path.insert(0, os.path.dirname(__file__))
+            from workers.retrieval import retrieve_dense
+            chunks = retrieve_dense(query, top_k=top_k)
+            sources = list({c["source"] for c in chunks})
+            return {
+                "chunks": chunks,
+                "sources": sources,
+                "total_found": len(chunks),
+            }
+        except Exception as e:
+            # Fallback: return mock data nếu ChromaDB chưa setup
+            return {
+                "chunks": [
+                    {
+                        "text": f"[MOCK] Không thể query ChromaDB: {e}. Kết quả giả lập.",
+                        "source": "mock_data",
+                        "score": 0.5,
+                    }
+                ],
+                "sources": ["mock_data"],
+                "total_found": 1,
+            }
 
 
 # Mock ticket database
@@ -326,7 +355,34 @@ def dispatch_tool(tool_name: str, tool_input: dict) -> dict:
             "error": f"Tool '{tool_name}' execution failed: {e}",
         }
 
+# ─────────────────────────────────────────────
+# OPTIONAL: HTTP MCP Server (FastAPI)
+# ─────────────────────────────────────────────
 
+def create_app():
+    try:
+        from fastapi import FastAPI
+        from pydantic import BaseModel
+
+        app = FastAPI(title="Mock MCP Server")
+
+        class ToolRequest(BaseModel):
+            tool_name: str
+            tool_input: dict
+
+        @app.get("/tools")
+        def get_tools():
+            return list_tools()
+
+        @app.post("/call")
+        def call_tool(req: ToolRequest):
+            return dispatch_tool(req.tool_name, req.tool_input)
+
+        return app
+
+    except ImportError:
+        return None
+    
 # ─────────────────────────────────────────────
 # Test & Demo
 # ─────────────────────────────────────────────
@@ -376,3 +432,10 @@ if __name__ == "__main__":
 
     print("\n✅ MCP server test done.")
     print("\nTODO Sprint 3: Implement HTTP server nếu muốn bonus +2.")
+
+    # 6. Optional: run HTTP server
+    app = create_app()
+    if app:
+        print("\n🚀 Starting FastAPI server at http://127.0.0.1:8000")
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
