@@ -37,35 +37,41 @@ DEFAULT_TOP_K = 3
 
 def _get_embedding_fn():
     """
-    Trả về embedding function.
-    TODO Sprint 1: Implement dùng OpenAI hoặc Sentence Transformers.
+    Trả về embedding function — cùng logic với `index.get_embedding` để khớp vector đã index.
     """
-    # Option A: Sentence Transformers (offline, không cần API key)
-    # try:
-    #     from sentence_transformers import SentenceTransformer
-    #     model = SentenceTransformer("all-MiniLM-L6-v2")
-    #     def embed(text: str) -> list:
-    #         return model.encode([text])[0].tolist()
-    #     return embed
-    # except ImportError:
-    #     pass
+    repo_root = Path(__file__).resolve().parent.parent
+    sys.path.insert(0, str(repo_root))
+    try:
+        from index import get_embedding
 
-    # Option B: OpenAI (cần API key)
+        def embed(text: str) -> list:
+            return get_embedding(text)
+
+        return embed
+    except Exception as e:
+        print(f"⚠️  Không dùng được index.get_embedding: {e}")
+
     try:
         from openai import OpenAI
+
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
         def embed(text: str) -> list:
-            resp = client.embeddings.create(input=text, model="text-embedding-3-small")
+            resp = client.embeddings.create(
+                input=text, model=os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+            )
             return resp.data[0].embedding
+
         return embed
     except ImportError:
         pass
 
-    # Fallback: random embeddings cho test (KHÔNG dùng production)
     import random
+
     def embed(text: str) -> list:
         return [random.random() for _ in range(384)]
-    print("⚠️  WARNING: Using random embeddings (test only). Install sentence-transformers.")
+
+    print("⚠️  WARNING: Using random embeddings (test only). Cài sentence-transformers và chạy index.py.")
     return embed
 
 
@@ -118,10 +124,12 @@ def retrieve_dense(query: str, top_k: int = DEFAULT_TOP_K) -> list:
             results["distances"][0],
             results["metadatas"][0]
         )):
+            # Chroma cosine distance: 0 = giống nhất; có thể >1 → clamp similarity về [0,1]
+            sim = max(0.0, min(1.0, 1.0 - float(dist)))
             chunks.append({
                 "text": doc,
                 "source": meta.get("source", "unknown"),
-                "score": round(1 - dist, 4),  # cosine similarity
+                "score": round(sim, 4),
                 "metadata": meta,
             })
         return chunks

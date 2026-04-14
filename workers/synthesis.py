@@ -25,7 +25,7 @@ SYSTEM_PROMPT = """Bạn là trợ lý IT Helpdesk nội bộ.
 Quy tắc nghiêm ngặt:
 1. CHỈ trả lời dựa vào context được cung cấp. KHÔNG dùng kiến thức ngoài.
 2. Nếu context không đủ để trả lời → nói rõ "Không đủ thông tin trong tài liệu nội bộ".
-3. Trích dẫn nguồn cuối mỗi câu quan trọng: [tên_file].
+3. Trích dẫn theo số thứ tự chunk trong context: [1], [2], … và/hoặc [tên_file.txt] ở các ý quan trọng.
 4. Trả lời súc tích, có cấu trúc. Không dài dòng.
 5. Nếu có exceptions/ngoại lệ → nêu rõ ràng trước khi kết luận.
 """
@@ -103,17 +103,17 @@ def _estimate_confidence(chunks: list, answer: str, policy_result: dict) -> floa
     if "Không đủ thông tin" in answer or "không có trong tài liệu" in answer.lower():
         return 0.3  # Abstain → moderate-low
 
-    # Weighted average của chunk scores
-    if chunks:
-        avg_score = sum(c.get("score", 0) for c in chunks) / len(chunks)
-    else:
-        avg_score = 0
+    scores_list = [(c.get("score", 0) or 0) for c in chunks]
+    top_scores = sorted(scores_list, reverse=True)[:3]
+    avg_top = sum(top_scores) / len(top_scores) if top_scores else 0.0
+    best = max(scores_list) if scores_list else 0.0
+    # Kết hợp điểm cao nhất và trung bình top-3 (tránh mọi chunk nhiễu kéo avg xuống ~0.1)
+    base = max(best, avg_top)
 
-    # Penalty nếu có exceptions (phức tạp hơn)
     exception_penalty = 0.05 * len(policy_result.get("exceptions_found", []))
 
-    confidence = min(0.95, avg_score - exception_penalty)
-    return round(max(0.1, confidence), 2)
+    confidence = min(0.95, max(0.0, base - exception_penalty))
+    return round(max(0.15, confidence), 2)
 
 
 def synthesize(task: str, chunks: list, policy_result: dict) -> dict:
