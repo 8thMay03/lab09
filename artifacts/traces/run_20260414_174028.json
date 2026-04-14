@@ -1,0 +1,124 @@
+{
+  "task": "Theo quy định IT nội bộ, nhân viên phải đổi mật khẩu sau bao nhiêu ngày? Và hệ thống cảnh báo trước bao nhiêu ngày?",
+  "route_reason": "task contains retrieval keyword: ['mật khẩu']",
+  "risk_high": false,
+  "needs_tool": false,
+  "hitl_triggered": false,
+  "retrieved_chunks": [
+    {
+      "text": "18 ngày/năm cho nhân viên trên 5 năm kinh nghiệm.\n- Chuyển năm sau: Tối đa 5 ngày phép năm chưa dùng được chuyển sang năm tiếp theo.\n\n1.2 Nghỉ ốm (Sick Leave):\n- Số ngày: 10 ngày/năm có trả lương.\n- Yêu cầu: Thông báo cho Line Manager trước 9:00 sáng ngày nghỉ.\n- Nếu nghỉ trên 3 ngày liên tiếp: Cần giấy tờ y tế từ bệnh viện.\n\n1.3 Nghỉ thai sản:\n- Nghỉ sinh con: 6 tháng theo quy định Luật Lao động.",
+      "source": "hr_leave_policy.txt",
+      "score": 0.7155,
+      "metadata": {
+        "source": "hr_leave_policy.txt",
+        "chunk_index": 1,
+        "char_count": 400
+      }
+    },
+    {
+      "text": "ghỉ sinh con: 6 tháng theo quy định Luật Lao động.\n- Nghỉ nuôi con nhỏ: 1 tiếng/ngày trong 12 tháng đầu sau sinh.\n\n1.4 Nghỉ lễ tết:\nTheo lịch nghỉ lễ quốc gia do HR công bố hàng năm vào tháng 12.\n\n=== Phần 2: Quy trình xin nghỉ phép ===\n\nBước 1: Nhân viên gửi yêu cầu nghỉ phép qua hệ thống HR Portal (https://hr.company.internal) ít nhất 3 ngày làm việc trước ngày nghỉ.",
+      "source": "hr_leave_policy.txt",
+      "score": 0.7132,
+      "metadata": {
+        "source": "hr_leave_policy.txt",
+        "char_count": 371,
+        "chunk_index": 2
+      }
+    },
+    {
+      "text": "ng và ngoại lệ ===\nHoàn tiền — Điều kiện áp dụng:\nYêu cầu được gửi trong vòng 7 ngày kể từ thời điểm xác nhận đơn hàng.\n\nNgoại lệ không được hoàn tiền:\n- Sản phẩm thuộc danh mục hàng kỹ thuật số (license key, subscription).\n- Đơn hàng đã áp dụng mã giảm giá đặc biệt theo chương trình khuyến mãi Flash Sale.\n- Sản phẩm đã được kích hoạt hoặc đăng ký tài khoản.",
+      "source": "policy_refund_v4.txt",
+      "score": 0.6849,
+      "metadata": {
+        "char_count": 360,
+        "source": "policy_refund_v4.txt",
+        "chunk_index": 2
+      }
+    },
+    {
+      "text": "g không thể đăng nhập.\n\nP2 — HIGH (Nghiêm trọng):\nĐịnh nghĩa: Sự cố ảnh hưởng một phần hệ thống, có workaround tạm thời.\nVí dụ: Một số tính năng không hoạt động, ảnh hưởng một nhóm người dùng.\n\nP3 — MEDIUM (Trung bình):\nĐịnh nghĩa: Lỗi ảnh hưởng không đáng kể, người dùng vẫn làm việc được.\n\nP4 — LOW (Thấp):\nĐịnh nghĩa: Yêu cầu cải tiến, gợi ý, hoặc lỗi giao diện nhỏ.",
+      "source": "sla_p1_2026.txt",
+      "score": 0.666,
+      "metadata": {
+        "source": "sla_p1_2026.txt",
+        "char_count": 369,
+        "chunk_index": 1
+      }
+    },
+    {
+      "text": "bản 3.\n\n=== Điều 2: Điều kiện được hoàn tiền ===\nKhách hàng được quyền yêu cầu hoàn tiền khi đáp ứng đủ các điều kiện sau:\n- Sản phẩm bị lỗi do nhà sản xuất, không phải do người dùng.\n- Yêu cầu được gửi trong vòng 7 ngày làm việc kể từ thời điểm xác nhận đơn hàng.\n- Đơn hàng chưa được sử dụng hoặc chưa bị mở seal.\n\n=== Điều 3: Điều kiện áp dụng và ngoại lệ ===\nHoàn tiền — Điều kiện áp dụng:",
+      "source": "policy_refund_v4.txt",
+      "score": 0.6306,
+      "metadata": {
+        "chunk_index": 1,
+        "char_count": 393,
+        "source": "policy_refund_v4.txt"
+      }
+    }
+  ],
+  "retrieved_sources": [
+    "policy_refund_v4.txt",
+    "hr_leave_policy.txt",
+    "sla_p1_2026.txt"
+  ],
+  "policy_result": {},
+  "mcp_tools_used": [],
+  "final_answer": "Không đủ thông tin trong tài liệu nội bộ để trả lời câu hỏi này.",
+  "sources": [
+    "policy_refund_v4.txt",
+    "hr_leave_policy.txt",
+    "sla_p1_2026.txt"
+  ],
+  "confidence": 0.3,
+  "history": [
+    "[supervisor] received task: Theo quy định IT nội bộ, nhân viên phải đổi mật khẩu sau bao nhiêu ngày? Và hệ t",
+    "[supervisor] route=retrieval_worker reason=task contains retrieval keyword: ['mật khẩu']",
+    "[retrieval_worker] retrieved 5 chunks from ['policy_refund_v4.txt', 'hr_leave_policy.txt', 'sla_p1_2026.txt']",
+    "[synthesis_worker] answer generated, confidence=0.3, sources=['policy_refund_v4.txt', 'hr_leave_policy.txt', 'sla_p1_2026.txt']",
+    "[graph] completed in 57183ms"
+  ],
+  "workers_called": [
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "retrieval_worker",
+  "latency_ms": 57183,
+  "run_id": "run_20260414_174028",
+  "worker_io_logs": [
+    {
+      "worker": "retrieval_worker",
+      "input": {
+        "task": "Theo quy định IT nội bộ, nhân viên phải đổi mật khẩu sau bao nhiêu ngày? Và hệ thống cảnh báo trước bao nhiêu ngày?",
+        "top_k": 5
+      },
+      "output": {
+        "chunks_count": 5,
+        "sources": [
+          "policy_refund_v4.txt",
+          "hr_leave_policy.txt",
+          "sla_p1_2026.txt"
+        ]
+      },
+      "error": null
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "Theo quy định IT nội bộ, nhân viên phải đổi mật khẩu sau bao nhiêu ngày? Và hệ thống cảnh báo trước bao nhiêu ngày?",
+        "chunks_count": 5,
+        "has_policy": false
+      },
+      "output": {
+        "answer_length": 64,
+        "sources": [
+          "policy_refund_v4.txt",
+          "hr_leave_policy.txt",
+          "sla_p1_2026.txt"
+        ],
+        "confidence": 0.3
+      },
+      "error": null
+    }
+  ],
+  "question_id": "gq08"
+}

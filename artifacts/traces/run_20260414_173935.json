@@ -1,0 +1,120 @@
+{
+  "task": "Mức phạt tài chính cụ thể khi đội IT vi phạm SLA P1 resolution time (không resolve trong 4 giờ) là bao nhiêu?",
+  "route_reason": "task contains retrieval keyword: ['p1', 'sla', 'resolution']",
+  "risk_high": false,
+  "needs_tool": false,
+  "hitl_triggered": false,
+  "retrieved_chunks": [
+    {
+      "text": "Yêu cầu cải tiến, gợi ý, hoặc lỗi giao diện nhỏ.\n\n=== Phần 2: SLA theo mức độ ưu tiên ===\n\nTicket P1:\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.\n- Xử lý và khắc phục (resolution): 4 giờ.\n- Escalation: Tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút.\n- Thông báo stakeholder: Ngay khi nhận ticket, update mỗi 30 phút cho đến khi resolve.",
+      "source": "sla_p1_2026.txt",
+      "score": 0.6089,
+      "metadata": {
+        "chunk_index": 2,
+        "char_count": 390,
+        "source": "sla_p1_2026.txt"
+      }
+    },
+    {
+      "text": "PagerDuty: Tự động nhắn on-call khi P1 ticket mới\nHotline on-call: ext. 9999 (24/7)\n\n=== Phần 5: Lịch sử phiên bản ===\nv2026.1 (2026-01-15): Cập nhật SLA P1 resolution từ 6 giờ xuống 4 giờ.\nv2025.3 (2025-09-01): Thêm quy trình escalation tự động.\nv2025.1 (2025-03-01): Phiên bản đầu tiên.",
+      "source": "sla_p1_2026.txt",
+      "score": 0.5747,
+      "metadata": {
+        "source": "sla_p1_2026.txt",
+        "chunk_index": 6,
+        "char_count": 288
+      }
+    },
+    {
+      "text": "công engineer xử lý trong 10 phút.\n\nBước 4: Xử lý\nEngineer cập nhật tiến độ lên ticket mỗi 30 phút. Nếu cần hỗ trợ thêm, escalate ngay.\n\nBước 5: Resolution\nSau khi khắc phục, viết incident report trong vòng 24 giờ.\n\n=== Phần 4: Công cụ và kênh liên lạc ===\nTicket system: Jira (project IT-SUPPORT)\nSlack channel: #incident-p1, #incident-p2\nPagerDuty: Tự động nhắn on-call khi P1 ticket mới",
+      "source": "sla_p1_2026.txt",
+      "score": 0.5737,
+      "metadata": {
+        "char_count": 389,
+        "chunk_index": 5,
+        "source": "sla_p1_2026.txt"
+      }
+    },
+    {
+      "text": "g không thể đăng nhập.\n\nP2 — HIGH (Nghiêm trọng):\nĐịnh nghĩa: Sự cố ảnh hưởng một phần hệ thống, có workaround tạm thời.\nVí dụ: Một số tính năng không hoạt động, ảnh hưởng một nhóm người dùng.\n\nP3 — MEDIUM (Trung bình):\nĐịnh nghĩa: Lỗi ảnh hưởng không đáng kể, người dùng vẫn làm việc được.\n\nP4 — LOW (Thấp):\nĐịnh nghĩa: Yêu cầu cải tiến, gợi ý, hoặc lỗi giao diện nhỏ.",
+      "source": "sla_p1_2026.txt",
+      "score": 0.5717,
+      "metadata": {
+        "char_count": 369,
+        "source": "sla_p1_2026.txt",
+        "chunk_index": 1
+      }
+    },
+    {
+      "text": "sẽ được gửi qua email công ty trong vòng 5 phút.\n\nQ: Tài khoản bị khóa sau bao nhiêu lần đăng nhập sai?\nA: Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp. Để mở khóa, liên hệ IT Helpdesk hoặc tự reset qua portal SSO.\n\nQ: Mật khẩu cần thay đổi định kỳ không?\nA: Có. Mật khẩu phải được thay đổi mỗi 90 ngày. Hệ thống sẽ nhắc nhở 7 ngày trước khi hết hạn.\n\n=== Section 2: VPN và kết nối từ xa ===",
+      "source": "it_helpdesk_faq.txt",
+      "score": 0.5666,
+      "metadata": {
+        "chunk_index": 1,
+        "source": "it_helpdesk_faq.txt",
+        "char_count": 398
+      }
+    }
+  ],
+  "retrieved_sources": [
+    "it_helpdesk_faq.txt",
+    "sla_p1_2026.txt"
+  ],
+  "policy_result": {},
+  "mcp_tools_used": [],
+  "final_answer": "Không đủ thông tin trong tài liệu nội bộ để trả lời câu hỏi này. Tài liệu được cung cấp định nghĩa về thời gian xử lý và khắc phục (resolution) của ticket P1 là 4 giờ [1], cũng như các quy trình liên quan đến P1 [1], [2], [3], [4]. Tuy nhiên, không có thông tin nào đề cập đến mức phạt tài chính cụ thể khi đội IT vi phạm thời gian xử lý này.",
+  "sources": [
+    "it_helpdesk_faq.txt",
+    "sla_p1_2026.txt"
+  ],
+  "confidence": 0.3,
+  "history": [
+    "[supervisor] received task: Mức phạt tài chính cụ thể khi đội IT vi phạm SLA P1 resolution time (không resol",
+    "[supervisor] route=retrieval_worker reason=task contains retrieval keyword: ['p1', 'sla', 'resolution']",
+    "[retrieval_worker] retrieved 5 chunks from ['it_helpdesk_faq.txt', 'sla_p1_2026.txt']",
+    "[synthesis_worker] answer generated, confidence=0.3, sources=['it_helpdesk_faq.txt', 'sla_p1_2026.txt']",
+    "[graph] completed in 52327ms"
+  ],
+  "workers_called": [
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "retrieval_worker",
+  "latency_ms": 52327,
+  "run_id": "run_20260414_173935",
+  "worker_io_logs": [
+    {
+      "worker": "retrieval_worker",
+      "input": {
+        "task": "Mức phạt tài chính cụ thể khi đội IT vi phạm SLA P1 resolution time (không resolve trong 4 giờ) là bao nhiêu?",
+        "top_k": 5
+      },
+      "output": {
+        "chunks_count": 5,
+        "sources": [
+          "it_helpdesk_faq.txt",
+          "sla_p1_2026.txt"
+        ]
+      },
+      "error": null
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "Mức phạt tài chính cụ thể khi đội IT vi phạm SLA P1 resolution time (không resolve trong 4 giờ) là bao nhiêu?",
+        "chunks_count": 5,
+        "has_policy": false
+      },
+      "output": {
+        "answer_length": 342,
+        "sources": [
+          "it_helpdesk_faq.txt",
+          "sla_p1_2026.txt"
+        ],
+        "confidence": 0.3
+      },
+      "error": null
+    }
+  ],
+  "question_id": "gq07"
+}

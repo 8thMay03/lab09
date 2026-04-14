@@ -1,0 +1,124 @@
+{
+  "task": "Một nhân viên mới đang trong probation period muốn làm remote vì lý do cá nhân. Yêu cầu này có được chấp thuận không? Điều kiện để được làm remote là gì?",
+  "route_reason": "task contains retrieval keyword: ['remote', 'probation']",
+  "risk_high": false,
+  "needs_tool": false,
+  "hitl_triggered": false,
+  "retrieved_chunks": [
+    {
+      "text": "nh sách làm thêm giờ ===\n\n3.1 Điều kiện làm thêm:\nLàm thêm giờ phải được Line Manager phê duyệt trước bằng văn bản.\n\n3.2 Hệ số lương làm thêm:\n- Ngày thường: 150% lương giờ tiêu chuẩn.\n- Ngày cuối tuần: 200% lương giờ tiêu chuẩn.\n- Ngày lễ: 300% lương giờ tiêu chuẩn.\n\n=== Phần 4: Remote work policy ===\n\n4.1 Điều kiện remote:\n- Nhân viên sau probation period có thể làm remote tối đa 2 ngày/tuần.",
+      "source": "hr_leave_policy.txt",
+      "score": 0.7449,
+      "metadata": {
+        "source": "hr_leave_policy.txt",
+        "chunk_index": 4,
+        "char_count": 397
+      }
+    },
+    {
+      "text": "đính kèm.\n\nQ: VPN có giới hạn số thiết bị không?\nA: Mỗi tài khoản được kết nối VPN trên tối đa 2 thiết bị cùng lúc.\n\n=== Section 3: Phần mềm và license ===\n\nQ: Tôi cần cài phần mềm mới, phải làm gì?\nA: Gửi yêu cầu qua Jira project IT-SOFTWARE. Line Manager phải phê duyệt trước khi IT cài đặt.\n\nQ: Ai chịu trách nhiệm gia hạn license phần mềm?\nA: IT Procurement team quản lý tất cả license.",
+      "source": "it_helpdesk_faq.txt",
+      "score": 0.7003,
+      "metadata": {
+        "chunk_index": 3,
+        "source": "it_helpdesk_faq.txt",
+        "char_count": 390
+      }
+    },
+    {
+      "text": "tion period có thể làm remote tối đa 2 ngày/tuần.\n- Team Lead phải phê duyệt lịch remote qua HR Portal.\n- Ngày onsite bắt buộc: Thứ 3 và Thứ 5 theo lịch team.\n\n4.2 Yêu cầu kỹ thuật khi remote:\n- Kết nối VPN bắt buộc khi làm việc với hệ thống nội bộ.\n- Camera bật trong các cuộc họp team.\n\n=== Phần 5: Liên hệ HR ===\nEmail: hr@company.internal\nHotline: ext. 2000\nHR Portal: https://hr.company.",
+      "source": "hr_leave_policy.txt",
+      "score": 0.6765,
+      "metadata": {
+        "source": "hr_leave_policy.txt",
+        "chunk_index": 5,
+        "char_count": 392
+      }
+    },
+    {
+      "text": "sẽ được gửi qua email công ty trong vòng 5 phút.\n\nQ: Tài khoản bị khóa sau bao nhiêu lần đăng nhập sai?\nA: Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp. Để mở khóa, liên hệ IT Helpdesk hoặc tự reset qua portal SSO.\n\nQ: Mật khẩu cần thay đổi định kỳ không?\nA: Có. Mật khẩu phải được thay đổi mỗi 90 ngày. Hệ thống sẽ nhắc nhở 7 ngày trước khi hết hạn.\n\n=== Section 2: VPN và kết nối từ xa ===",
+      "source": "it_helpdesk_faq.txt",
+      "score": 0.6723,
+      "metadata": {
+        "chunk_index": 1,
+        "source": "it_helpdesk_faq.txt",
+        "char_count": 398
+      }
+    },
+    {
+      "text": "ng và ngoại lệ ===\nHoàn tiền — Điều kiện áp dụng:\nYêu cầu được gửi trong vòng 7 ngày kể từ thời điểm xác nhận đơn hàng.\n\nNgoại lệ không được hoàn tiền:\n- Sản phẩm thuộc danh mục hàng kỹ thuật số (license key, subscription).\n- Đơn hàng đã áp dụng mã giảm giá đặc biệt theo chương trình khuyến mãi Flash Sale.\n- Sản phẩm đã được kích hoạt hoặc đăng ký tài khoản.",
+      "source": "policy_refund_v4.txt",
+      "score": 0.63,
+      "metadata": {
+        "source": "policy_refund_v4.txt",
+        "chunk_index": 2,
+        "char_count": 360
+      }
+    }
+  ],
+  "retrieved_sources": [
+    "it_helpdesk_faq.txt",
+    "policy_refund_v4.txt",
+    "hr_leave_policy.txt"
+  ],
+  "policy_result": {},
+  "mcp_tools_used": [],
+  "final_answer": "Chào bạn,\n\nDựa trên tài liệu nội bộ, tôi xin trả lời câu hỏi của bạn như sau:\n\n**1. Yêu cầu làm remote của nhân viên đang trong probation period:**\n\nNhân viên đang trong thời gian thử việc (probation period) **không được chấp thuận** làm việc từ xa (remote).\nTài liệu quy định rõ ràng rằng: \"Nhân viên **sau** probation period có thể làm remote tối đa 2 ngày/tuần.\" [1], [3]\n\n**2. Điều kiện để được làm remote:**\n\nĐối với những nhân viên đủ điều kiện (tức là đã hoàn thành thời gian thử việc), các điều kiện để được làm remote bao gồm:\n\n*   **Điều kiện về thời gian làm việc từ xa:**\n    *   Chỉ áp dụng cho nhân viên đã qua thời gian thử việc (sau probation period) [1], [3].\n    *   Có thể làm remote tối đa 2 ngày/tuần [1], [3].\n    *   Có các ngày làm việc tại văn phòng bắt buộc: Thứ 3 và Thứ 5 theo lịch team [3].\n\n*   **Điều kiện về phê duyệt:**\n    *   Lịch làm remote phải được Team Lead phê duyệt thông qua HR Portal [3].\n\n*   **Yêu cầu kỹ thuật khi làm remote:**\n    *   Bắt buộc kết nối VPN khi làm việc với hệ thống nội bộ [3].\n        *   Mỗi tài khoản được kết nối VPN trên tối đa 2 thiết bị cùng lúc [2].\n    *   Camera phải được bật trong các cuộc họp team [3].",
+  "sources": [
+    "it_helpdesk_faq.txt",
+    "policy_refund_v4.txt",
+    "hr_leave_policy.txt"
+  ],
+  "confidence": 0.95,
+  "history": [
+    "[supervisor] received task: Một nhân viên mới đang trong probation period muốn làm remote vì lý do cá nhân. ",
+    "[supervisor] route=retrieval_worker reason=task contains retrieval keyword: ['remote', 'probation']",
+    "[retrieval_worker] retrieved 5 chunks from ['it_helpdesk_faq.txt', 'policy_refund_v4.txt', 'hr_leave_policy.txt']",
+    "[synthesis_worker] answer generated, confidence=0.95, sources=['it_helpdesk_faq.txt', 'policy_refund_v4.txt', 'hr_leave_policy.txt']",
+    "[graph] completed in 39972ms"
+  ],
+  "workers_called": [
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "retrieval_worker",
+  "latency_ms": 39972,
+  "run_id": "run_20260414_173855",
+  "worker_io_logs": [
+    {
+      "worker": "retrieval_worker",
+      "input": {
+        "task": "Một nhân viên mới đang trong probation period muốn làm remote vì lý do cá nhân. Yêu cầu này có được chấp thuận không? Điều kiện để được làm remote là gì?",
+        "top_k": 5
+      },
+      "output": {
+        "chunks_count": 5,
+        "sources": [
+          "it_helpdesk_faq.txt",
+          "policy_refund_v4.txt",
+          "hr_leave_policy.txt"
+        ]
+      },
+      "error": null
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "Một nhân viên mới đang trong probation period muốn làm remote vì lý do cá nhân. Yêu cầu này có được chấp thuận không? Điều kiện để được làm remote là gì?",
+        "chunks_count": 5,
+        "has_policy": false
+      },
+      "output": {
+        "answer_length": 1178,
+        "sources": [
+          "it_helpdesk_faq.txt",
+          "policy_refund_v4.txt",
+          "hr_leave_policy.txt"
+        ],
+        "confidence": 0.95
+      },
+      "error": null
+    }
+  ],
+  "question_id": "gq06"
+}

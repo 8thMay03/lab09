@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-14T15:44:37.224525",
+  "generated_at": "2026-04-14T17:42:28.288071",
   "day08_single_agent": {
     "baseline": {
       "config_label": "baseline_dense",
@@ -187,45 +187,45 @@
     }
   },
   "day09_multi_agent": {
-    "total_traces": 85,
+    "total_traces": 12,
     "routing_distribution": {
-      "retrieval_worker": "39/85 (45%)",
-      "policy_tool_worker": "46/85 (54%)"
+      "retrieval_worker": "6/12 (50%)",
+      "policy_tool_worker": "6/12 (50%)"
     },
-    "avg_confidence": 0.602,
-    "avg_latency_ms": 33570,
-    "mcp_usage_rate": "46/85 (54%)",
-    "hitl_rate": "3/85 (3%)",
+    "avg_confidence": 0.821,
+    "avg_latency_ms": 46931,
+    "mcp_usage_rate": "2/12 (16%)",
+    "hitl_rate": "0/12 (0%)",
     "top_sources": [
       [
         "sla_p1_2026.txt",
-        27
+        6
       ],
       [
         "hr_leave_policy.txt",
-        12
-      ],
-      [
-        "it_helpdesk_faq.txt",
-        9
+        6
       ],
       [
         "policy_refund_v4.txt",
         6
       ],
       [
+        "it_helpdesk_faq.txt",
+        5
+      ],
+      [
         "access_control_sop.txt",
-        3
+        2
       ]
     ]
   },
   "analysis": {
     "architecture": "Day 08 = single-agent pipeline (query→retrieve→generate). Day 09 = multi-agent supervisor-worker (supervisor→route→worker→synthesis).",
     "routing_visibility": "Day 09 có supervisor_route + route_reason cho từng câu → dễ debug. Day 08 không có routing, mọi câu đi qua cùng 1 pipeline.",
-    "faithfulness_comparison": "Day 08 baseline=4.2/5, variant=4.9/5. Day 09 confidence=0.602 (scale khác, dùng worker self-assessment).",
+    "faithfulness_comparison": "Day 08 baseline=4.2/5, variant=4.9/5. Day 09 confidence=0.821 (scale khác, dùng worker self-assessment).",
     "completeness_comparison": "Day 08 baseline=3.4/5, variant=3.4/5. Day 09 tách policy + retrieval → answer chính xác hơn cho policy questions.",
-    "abstain_handling": "Day 08 baseline abstain=2/10 (20%), variant abstain=3/10 (30%). Day 09 HITL=3/85 (3%) — route câu khó sang human_review.",
-    "latency_delta": "Day 09 avg=33570ms — chậm hơn Day 08 do routing + MCP overhead, nhưng đổi lại có debuggability và extensibility.",
+    "abstain_handling": "Day 08 baseline abstain=2/10 (20%), variant abstain=3/10 (30%). Day 09 HITL=0/12 (0%) — route câu khó sang human_review.",
+    "latency_delta": "Day 09 avg=46931ms — chậm hơn Day 08 do routing + MCP overhead, nhưng đổi lại có debuggability và extensibility.",
     "debuggability": "Multi-agent: test từng worker độc lập, xem trace per-step. Single-agent: chỉ xem input/output cuối.",
     "mcp_benefit": "Day 09 extend capability qua MCP (thêm tool không sửa core). Day 08 phải hard-code mọi logic vào rag_answer.py."
   }
