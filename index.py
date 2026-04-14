@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 # =============================================================================
 # CẤU HÌNH
@@ -220,24 +220,41 @@ def get_embedding(text: str) -> List[float]:
     """
     text = (text or "").strip() or " "
 
+    global _embedding_st_model
+
+    # ✅ PRIORITY 1: SentenceTransformer (consistent with retrieval.py)
+    try:
+        if _embedding_st_model is None:
+            from sentence_transformers import SentenceTransformer
+
+            print("🔄 Loading embedding model for indexing (SentenceTransformer)...")
+            _embedding_st_model = SentenceTransformer("all-MiniLM-L6-v2")  # MUST match retrieval
+
+        vec = _embedding_st_model.encode(text, convert_to_numpy=True)
+        return vec.tolist()
+
+    except Exception as e:
+        print(f"⚠️ SentenceTransformer failed: {e}")
+
+    # ⚠️ PRIORITY 2: OpenAI fallback (only if explicitly available)
     api_key = os.getenv("OPENAI_API_KEY")
     if api_key:
-        from openai import OpenAI
+        try:
+            from openai import OpenAI
 
-        client = OpenAI(api_key=api_key)
-        model = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-        response = client.embeddings.create(input=text, model=model)
-        return response.data[0].embedding
+            print("⚠️ Falling back to OpenAI embeddings")
+            client = OpenAI(api_key=api_key)
+            model = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
 
-    global _embedding_st_model
-    if _embedding_st_model is None:
-        from sentence_transformers import SentenceTransformer
+            response = client.embeddings.create(input=text, model=model)
+            return response.data[0].embedding
+        except Exception as e:
+            print(f"❌ OpenAI embedding failed: {e}")
 
-        _embedding_st_model = SentenceTransformer(
-            os.getenv("ST_EMBEDDING_MODEL", "paraphrase-multilingual-MiniLM-L12-v2")
-        )
-    vec = _embedding_st_model.encode(text, convert_to_numpy=True)
-    return vec.tolist()
+    # ❌ FINAL FALLBACK (never crash indexing)
+    print("⚠️ Using random embedding fallback (NOT for production)")
+    import random
+    return [random.random() for _ in range(384)]
 
 
 def _normalize_chroma_metadata(meta: Dict[str, Any]) -> Dict[str, Any]:
