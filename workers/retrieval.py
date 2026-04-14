@@ -17,6 +17,7 @@ Gọi độc lập để test:
 
 import os
 import sys
+import re
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -140,6 +141,101 @@ def retrieve_dense(query: str, top_k: int = DEFAULT_TOP_K) -> list:
         return []
 
 
+def _tokenize(text: str) -> list[str]:
+    """Tokenize đơn giản cho sparse retrieval."""
+    return re.findall(r"\w+", (text or "").lower())
+
+
+def retrieve_sparse(query: str, top_k: int = DEFAULT_TOP_K, candidate_limit: int = 200) -> list:
+    """
+    Sparse retrieval (BM25-lite): lấy candidate từ Chroma collection.get(),
+    chấm điểm bằng token overlap có trọng số query-term coverage.
+    """
+    try:
+        collection = _get_collection()
+        all_docs = collection.get(
+            include=["documents", "metadatas"],
+            limit=candidate_limit,
+        )
+        docs = all_docs.get("documents") or []
+        metas = all_docs.get("metadatas") or []
+        if not docs:
+            return []
+
+        query_tokens = _tokenize(query)
+        if not query_tokens:
+            return []
+        q_unique = set(query_tokens)
+
+        scored = []
+        for doc, meta in zip(docs, metas):
+            text_tokens = _tokenize(doc)
+            if not text_tokens:
+                continue
+            token_set = set(text_tokens)
+            overlap = q_unique.intersection(token_set)
+            if not overlap:
+                continue
+
+            # coverage ưu tiên số lượng term query match; density nhẹ để tránh bias doc dài
+            coverage = len(overlap) / max(1, len(q_unique))
+            density = len(overlap) / max(20, len(token_set))
+            sparse_score = min(1.0, coverage * 0.85 + density * 0.15)
+            scored.append(
+                {
+                    "text": doc,
+                    "source": (meta or {}).get("source", "unknown"),
+                    "score": round(sparse_score, 4),
+                    "metadata": meta or {},
+                }
+            )
+
+        scored.sort(key=lambda x: x["score"], reverse=True)
+        return scored[:top_k]
+    except Exception as e:
+        print(f"⚠️  Sparse retrieval failed: {e}")
+        return []
+
+
+def retrieve_hybrid(query: str, top_k: int = DEFAULT_TOP_K) -> list:
+    """
+    Hybrid retrieval: dense + sparse, fusion bằng Reciprocal Rank Fusion (RRF).
+    """
+    dense = retrieve_dense(query, top_k=max(top_k * 2, 6))
+    sparse = retrieve_sparse(query, top_k=max(top_k * 2, 6))
+
+    # Merge key: source + prefix text để dedupe
+    def key_of(chunk: dict) -> str:
+        text_prefix = (chunk.get("text", "") or "")[:120]
+        return f"{chunk.get('source', 'unknown')}::{text_prefix}"
+
+    rank_fused = {}
+    base_payload = {}
+    k = 60  # RRF constant
+
+    for rank, c in enumerate(dense, start=1):
+        ck = key_of(c)
+        rank_fused[ck] = rank_fused.get(ck, 0.0) + (1.0 / (k + rank))
+        base_payload.setdefault(ck, c)
+    for rank, c in enumerate(sparse, start=1):
+        ck = key_of(c)
+        rank_fused[ck] = rank_fused.get(ck, 0.0) + (1.0 / (k + rank))
+        base_payload.setdefault(ck, c)
+
+    if not rank_fused:
+        return []
+
+    max_rrf = max(rank_fused.values())
+    merged = []
+    for ck, rrf_score in rank_fused.items():
+        payload = dict(base_payload[ck])
+        payload["score"] = round(rrf_score / max_rrf, 4)
+        merged.append(payload)
+
+    merged.sort(key=lambda x: x["score"], reverse=True)
+    return merged[:top_k]
+
+
 def run(state: dict) -> dict:
     """
     Worker entry point — gọi từ graph.py.
@@ -167,7 +263,8 @@ def run(state: dict) -> dict:
     }
 
     try:
-        chunks = retrieve_dense(task, top_k=top_k)
+        # Hybrid retrieval mặc định để tăng recall + precision cho multi-hop/policy queries.
+        chunks = retrieve_hybrid(task, top_k=top_k)
 
         sources = list({c["source"] for c in chunks})
 
@@ -199,6 +296,11 @@ def run(state: dict) -> dict:
 # ─────────────────────────────────────────────
 
 if __name__ == "__main__":
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
     print("=" * 50)
     print("Retrieval Worker — Standalone Test")
     print("=" * 50)
@@ -210,7 +312,7 @@ if __name__ == "__main__":
     ]
 
     for query in test_queries:
-        print(f"\n▶ Query: {query}")
+        print(f"\n>> Query: {query}")
         result = run({"task": query})
         chunks = result.get("retrieved_chunks", [])
         print(f"  Retrieved: {len(chunks)} chunks")
