@@ -1,0 +1,100 @@
+{
+  "task": "Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
+  "route_reason": "task contains retrieval keyword: ['remote']",
+  "risk_high": false,
+  "needs_tool": false,
+  "hitl_triggered": false,
+  "retrieved_chunks": [
+    {
+      "text": "ng đầu sau sinh.\n\n1.4 Nghỉ lễ tết:\nTheo lịch nghỉ lễ quốc gia do HR công bố hàng năm vào tháng 12.\n\n=== Phần 2: Quy trình xin nghỉ phép ===\n\nBước 1: Nhân viên gửi yêu cầu nghỉ phép qua hệ thống HR Portal (https://hr.company.internal) ít nhất 3 ngày làm việc trước ngày nghỉ.\nBước 2: Line Manager phê duyệt hoặc từ chối trong vòng 1 ngày làm việc.\nBước 3: Nhân viên nhận thông báo qua email sau khi được phê duyệt.",
+      "source": "hr_leave_policy.txt",
+      "score": 0.597,
+      "metadata": {
+        "chunk_index": 2,
+        "source": "hr_leave_policy.txt",
+        "char_count": 413
+      }
+    },
+    {
+      "text": "ty dùng?\nA: Công ty sử dụng Cisco AnyConnect. Download tại https://vpn.company.internal/download.\n\nQ: Tôi bị mất kết nối VPN liên tục, phải làm gì?\nA: Kiểm tra kết nối Internet trước. Nếu vẫn lỗi, tạo ticket P3 với log file VPN đính kèm.\n\nQ: VPN có giới hạn số thiết bị không?\nA: Mỗi tài khoản được kết nối VPN trên tối đa 2 thiết bị cùng lúc.\n\n=== Section 3: Phần mềm và license ===\n\nQ: Tôi cần cài phần mềm mới, phải làm gì?\nA: Gửi yêu cầu qua Jira project IT-SOFTWARE.",
+      "source": "it_helpdesk_faq.txt",
+      "score": 0.5872,
+      "metadata": {
+        "source": "it_helpdesk_faq.txt",
+        "chunk_index": 2,
+        "char_count": 471
+      }
+    },
+    {
+      "text": "oản bị khóa sau bao nhiêu lần đăng nhập sai?\nA: Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp. Để mở khóa, liên hệ IT Helpdesk hoặc tự reset qua portal SSO.\n\nQ: Mật khẩu cần thay đổi định kỳ không?\nA: Có. Mật khẩu phải được thay đổi mỗi 90 ngày. Hệ thống sẽ nhắc nhở 7 ngày trước khi hết hạn.\n\n=== Section 2: VPN và kết nối từ xa ===\n\nQ: Phần mềm VPN nào công ty dùng?\nA: Công ty sử dụng Cisco AnyConnect. Download tại https://vpn.company.internal/download.",
+      "source": "it_helpdesk_faq.txt",
+      "score": 0.5812,
+      "metadata": {
+        "char_count": 463,
+        "source": "it_helpdesk_faq.txt",
+        "chunk_index": 1
+      }
+    }
+  ],
+  "retrieved_sources": [
+    "hr_leave_policy.txt",
+    "it_helpdesk_faq.txt"
+  ],
+  "policy_result": {},
+  "mcp_tools_used": [],
+  "final_answer": "Không đủ thông tin trong tài liệu nội bộ.",
+  "sources": [
+    "hr_leave_policy.txt",
+    "it_helpdesk_faq.txt"
+  ],
+  "confidence": 0.3,
+  "history": [
+    "[supervisor] received task: Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
+    "[supervisor] route=retrieval_worker reason=task contains retrieval keyword: ['remote']",
+    "[retrieval_worker] retrieved 3 chunks from ['hr_leave_policy.txt', 'it_helpdesk_faq.txt']",
+    "[synthesis_worker] answer generated, confidence=0.3, sources=['hr_leave_policy.txt', 'it_helpdesk_faq.txt']",
+    "[graph] completed in 8559ms"
+  ],
+  "workers_called": [
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "retrieval_worker",
+  "latency_ms": 8559,
+  "run_id": "run_20260414_150422",
+  "worker_io_logs": [
+    {
+      "worker": "retrieval_worker",
+      "input": {
+        "task": "Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
+        "top_k": 3
+      },
+      "output": {
+        "chunks_count": 3,
+        "sources": [
+          "hr_leave_policy.txt",
+          "it_helpdesk_faq.txt"
+        ]
+      },
+      "error": null
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
+        "chunks_count": 3,
+        "has_policy": false
+      },
+      "output": {
+        "answer_length": 41,
+        "sources": [
+          "hr_leave_policy.txt",
+          "it_helpdesk_faq.txt"
+        ],
+        "confidence": 0.3
+      },
+      "error": null
+    }
+  ],
+  "question_id": "q05"
+}

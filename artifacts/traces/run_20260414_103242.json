@@ -1,0 +1,100 @@
+{
+  "task": "Nhân viên vừa vào thử việc (trong probation period) muốn làm remote vì lý do cá nhân. Điều kiện là gì?",
+  "route_reason": "task contains retrieval keyword: ['remote', 'probation']",
+  "risk_high": false,
+  "needs_tool": false,
+  "hitl_triggered": false,
+  "retrieved_chunks": [
+    {
+      "text": "giờ tiêu chuẩn.\n- Ngày cuối tuần: 200% lương giờ tiêu chuẩn.\n- Ngày lễ: 300% lương giờ tiêu chuẩn.\n\n=== Phần 4: Remote work policy ===\n\n4.1 Điều kiện remote:\n- Nhân viên sau probation period có thể làm remote tối đa 2 ngày/tuần.\n- Team Lead phải phê duyệt lịch remote qua HR Portal.\n- Ngày onsite bắt buộc: Thứ 3 và Thứ 5 theo lịch team.\n\n4.2 Yêu cầu kỹ thuật khi remote:\n- Kết nối VPN bắt buộc khi làm việc với hệ thống nội bộ.\n- Camera bật trong các cuộc họp team.\n\n=== Phần 5: Liên hệ HR ===",
+      "source": "hr_leave_policy.txt",
+      "score": 0.6835,
+      "metadata": {
+        "char_count": 494,
+        "source": "hr_leave_policy.txt",
+        "chunk_index": 4
+      }
+    },
+    {
+      "text": "ng đầu sau sinh.\n\n1.4 Nghỉ lễ tết:\nTheo lịch nghỉ lễ quốc gia do HR công bố hàng năm vào tháng 12.\n\n=== Phần 2: Quy trình xin nghỉ phép ===\n\nBước 1: Nhân viên gửi yêu cầu nghỉ phép qua hệ thống HR Portal (https://hr.company.internal) ít nhất 3 ngày làm việc trước ngày nghỉ.\nBước 2: Line Manager phê duyệt hoặc từ chối trong vòng 1 ngày làm việc.\nBước 3: Nhân viên nhận thông báo qua email sau khi được phê duyệt.",
+      "source": "hr_leave_policy.txt",
+      "score": 0.6287,
+      "metadata": {
+        "char_count": 413,
+        "chunk_index": 2,
+        "source": "hr_leave_policy.txt"
+      }
+    },
+    {
+      "text": "oản bị khóa sau bao nhiêu lần đăng nhập sai?\nA: Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp. Để mở khóa, liên hệ IT Helpdesk hoặc tự reset qua portal SSO.\n\nQ: Mật khẩu cần thay đổi định kỳ không?\nA: Có. Mật khẩu phải được thay đổi mỗi 90 ngày. Hệ thống sẽ nhắc nhở 7 ngày trước khi hết hạn.\n\n=== Section 2: VPN và kết nối từ xa ===\n\nQ: Phần mềm VPN nào công ty dùng?\nA: Công ty sử dụng Cisco AnyConnect. Download tại https://vpn.company.internal/download.",
+      "source": "it_helpdesk_faq.txt",
+      "score": 0.6107,
+      "metadata": {
+        "chunk_index": 1,
+        "char_count": 463,
+        "source": "it_helpdesk_faq.txt"
+      }
+    }
+  ],
+  "retrieved_sources": [
+    "it_helpdesk_faq.txt",
+    "hr_leave_policy.txt"
+  ],
+  "policy_result": {},
+  "mcp_tools_used": [],
+  "final_answer": "[SYNTHESIS ERROR] Không thể gọi LLM. Kiểm tra API key trong .env.",
+  "sources": [
+    "it_helpdesk_faq.txt",
+    "hr_leave_policy.txt"
+  ],
+  "confidence": 0.64,
+  "history": [
+    "[supervisor] received task: Nhân viên vừa vào thử việc (trong probation period) muốn làm remote vì lý do cá ",
+    "[supervisor] route=retrieval_worker reason=task contains retrieval keyword: ['remote', 'probation']",
+    "[retrieval_worker] retrieved 3 chunks from ['it_helpdesk_faq.txt', 'hr_leave_policy.txt']",
+    "[synthesis_worker] answer generated, confidence=0.64, sources=['it_helpdesk_faq.txt', 'hr_leave_policy.txt']",
+    "[graph] completed in 16415ms"
+  ],
+  "workers_called": [
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "retrieval_worker",
+  "latency_ms": 16415,
+  "run_id": "run_20260414_103242",
+  "worker_io_logs": [
+    {
+      "worker": "retrieval_worker",
+      "input": {
+        "task": "Nhân viên vừa vào thử việc (trong probation period) muốn làm remote vì lý do cá nhân. Điều kiện là gì?",
+        "top_k": 3
+      },
+      "output": {
+        "chunks_count": 3,
+        "sources": [
+          "it_helpdesk_faq.txt",
+          "hr_leave_policy.txt"
+        ]
+      },
+      "error": null
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "Nhân viên vừa vào thử việc (trong probation period) muốn làm remote vì lý do cá nhân. Điều kiện là gì?",
+        "chunks_count": 3,
+        "has_policy": false
+      },
+      "output": {
+        "answer_length": 65,
+        "sources": [
+          "it_helpdesk_faq.txt",
+          "hr_leave_policy.txt"
+        ],
+        "confidence": 0.64
+      },
+      "error": null
+    }
+  ],
+  "question_id": "q14"
+}

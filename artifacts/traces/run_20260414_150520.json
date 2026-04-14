@@ -1,0 +1,96 @@
+{
+  "task": "Ticket P1 được tạo lúc 22:47. Ai sẽ nhận thông báo đầu tiên và qua kênh nào? Escalation xảy ra lúc mấy giờ?",
+  "route_reason": "task contains retrieval keyword: ['p1', 'ticket', 'escalation']",
+  "risk_high": false,
+  "needs_tool": false,
+  "hitl_triggered": false,
+  "retrieved_chunks": [
+    {
+      "text": "độ ưu tiên ===\n\nTicket P1:\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.\n- Xử lý và khắc phục (resolution): 4 giờ.\n- Escalation: Tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút.\n- Thông báo stakeholder: Ngay khi nhận ticket, update mỗi 30 phút cho đến khi resolve.\n\nTicket P2:\n- Phản hồi ban đầu: 2 giờ.\n- Xử lý và khắc phục: 1 ngày làm việc.\n- Escalation: Tự động escalate sau 90 phút không có phản hồi.\n\nTicket P3:",
+      "source": "sla_p1_2026.txt",
+      "score": 0.6987,
+      "metadata": {
+        "source": "sla_p1_2026.txt",
+        "chunk_index": 2,
+        "char_count": 467
+      }
+    },
+    {
+      "text": "au khi khắc phục, viết incident report trong vòng 24 giờ.\n\n=== Phần 4: Công cụ và kênh liên lạc ===\nTicket system: Jira (project IT-SUPPORT)\nSlack channel: #incident-p1, #incident-p2\nPagerDuty: Tự động nhắn on-call khi P1 ticket mới\nHotline on-call: ext. 9999 (24/7)\n\n=== Phần 5: Lịch sử phiên bản ===\nv2026.1 (2026-01-15): Cập nhật SLA P1 resolution từ 6 giờ xuống 4 giờ.\nv2025.3 (2025-09-01): Thêm quy trình escalation tự động.\nv2025.1 (2025-03-01): Phiên bản đầu tiên.",
+      "source": "sla_p1_2026.txt",
+      "score": 0.6653,
+      "metadata": {
+        "source": "sla_p1_2026.txt",
+        "char_count": 471,
+        "chunk_index": 5
+      }
+    },
+    {
+      "text": ".\n\nP2 — HIGH (Nghiêm trọng):\nĐịnh nghĩa: Sự cố ảnh hưởng một phần hệ thống, có workaround tạm thời.\nVí dụ: Một số tính năng không hoạt động, ảnh hưởng một nhóm người dùng.\n\nP3 — MEDIUM (Trung bình):\nĐịnh nghĩa: Lỗi ảnh hưởng không đáng kể, người dùng vẫn làm việc được.\n\nP4 — LOW (Thấp):\nĐịnh nghĩa: Yêu cầu cải tiến, gợi ý, hoặc lỗi giao diện nhỏ.\n\n=== Phần 2: SLA theo mức độ ưu tiên ===\n\nTicket P1:\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.",
+      "source": "sla_p1_2026.txt",
+      "score": 0.65,
+      "metadata": {
+        "source": "sla_p1_2026.txt",
+        "chunk_index": 1,
+        "char_count": 473
+      }
+    }
+  ],
+  "retrieved_sources": [
+    "sla_p1_2026.txt"
+  ],
+  "policy_result": {},
+  "mcp_tools_used": [],
+  "final_answer": "Khi ticket P1 được tạo lúc 22:47:\n\n1.  **Ai nhận thông báo đầu tiên:** Người on-call [sla_p1_2026.txt].\n2.  **Qua kênh nào:** PagerDuty [sla_p1_2026.txt].\n3.  **Escalation xảy ra lúc mấy giờ:** 22:57. Escalation tự động lên Senior Engineer nếu không có phản hồi trong 10 phút [sla_p1_2026.txt].",
+  "sources": [
+    "sla_p1_2026.txt"
+  ],
+  "confidence": 0.67,
+  "history": [
+    "[supervisor] received task: Ticket P1 được tạo lúc 22:47. Ai sẽ nhận thông báo đầu tiên và qua kênh nào? Esc",
+    "[supervisor] route=retrieval_worker reason=task contains retrieval keyword: ['p1', 'ticket', 'escalation']",
+    "[retrieval_worker] retrieved 3 chunks from ['sla_p1_2026.txt']",
+    "[synthesis_worker] answer generated, confidence=0.67, sources=['sla_p1_2026.txt']",
+    "[graph] completed in 10237ms"
+  ],
+  "workers_called": [
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "retrieval_worker",
+  "latency_ms": 10237,
+  "run_id": "run_20260414_150520",
+  "worker_io_logs": [
+    {
+      "worker": "retrieval_worker",
+      "input": {
+        "task": "Ticket P1 được tạo lúc 22:47. Ai sẽ nhận thông báo đầu tiên và qua kênh nào? Escalation xảy ra lúc mấy giờ?",
+        "top_k": 3
+      },
+      "output": {
+        "chunks_count": 3,
+        "sources": [
+          "sla_p1_2026.txt"
+        ]
+      },
+      "error": null
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "Ticket P1 được tạo lúc 22:47. Ai sẽ nhận thông báo đầu tiên và qua kênh nào? Escalation xảy ra lúc mấy giờ?",
+        "chunks_count": 3,
+        "has_policy": false
+      },
+      "output": {
+        "answer_length": 294,
+        "sources": [
+          "sla_p1_2026.txt"
+        ],
+        "confidence": 0.67
+      },
+      "error": null
+    }
+  ],
+  "question_id": "q11"
+}

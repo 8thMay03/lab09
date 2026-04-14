@@ -17,9 +17,6 @@ Outputs:
 import json
 import os
 import sys
-from dotenv import load_dotenv
-
-load_dotenv(override=True)
 import argparse
 from datetime import datetime
 from typing import Optional
@@ -238,180 +235,44 @@ def analyze_traces(traces_dir: str = "artifacts/traces") -> dict:
 # 4. Compare Single vs Multi Agent
 # ─────────────────────────────────────────────
 
-def _load_day08_from_csv(csv_path: str) -> dict:
-    """
-    Parse lab08 ab_comparison.csv để lấy metrics thực tế.
-    CSV chứa cả baseline và variant results (cột config_label phân biệt).
-    """
-    import csv
-
-    baseline_rows = []
-    variant_rows = []
-
-    with open(csv_path, encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            label = row.get("config_label", "")
-            if "baseline" in label:
-                baseline_rows.append(row)
-            elif "variant" in label:
-                variant_rows.append(row)
-
-    def _compute_metrics(rows: list, label: str) -> dict:
-        metrics_names = ["faithfulness", "relevance", "context_recall", "completeness"]
-        averages = {}
-        per_question = []
-
-        for m in metrics_names:
-            scores = []
-            for r in rows:
-                val = r.get(m)
-                if val and val not in ("None", ""):
-                    try:
-                        scores.append(int(val))
-                    except (ValueError, TypeError):
-                        pass
-            averages[m] = round(sum(scores) / len(scores), 2) if scores else None
-
-        # Tính abstain rate: câu trả lời chứa "không biết" hoặc "không có thông tin"
-        abstain_count = 0
-        for r in rows:
-            ans = (r.get("answer") or "").lower()
-            if "không biết" in ans or "không có thông tin" in ans or "xin lỗi" in ans:
-                abstain_count += 1
-
-        # Tính cross-doc accuracy (category chứa "Cross" hoặc multi-hop)
-        cross_doc_rows = [r for r in rows if "cross" in (r.get("category") or "").lower()]
-        cross_doc_correct = 0
-        for r in cross_doc_rows:
-            comp = r.get("completeness")
-            if comp and comp not in ("None", ""):
-                try:
-                    if int(comp) >= 3:
-                        cross_doc_correct += 1
-                except (ValueError, TypeError):
-                    pass
-
-        total = len(rows)
-        return {
-            "config_label": label,
-            "total_questions": total,
-            "avg_faithfulness": averages.get("faithfulness"),
-            "avg_relevance": averages.get("relevance"),
-            "avg_context_recall": averages.get("context_recall"),
-            "avg_completeness": averages.get("completeness"),
-            "abstain_rate": f"{abstain_count}/{total} ({100 * abstain_count // total}%)" if total else "0%",
-            "cross_doc_accuracy": (
-                f"{cross_doc_correct}/{len(cross_doc_rows)} ({100 * cross_doc_correct // len(cross_doc_rows)}%)"
-                if cross_doc_rows else "N/A"
-            ),
-            "per_question": [
-                {
-                    "id": r.get("id"),
-                    "category": r.get("category"),
-                    "faithfulness": r.get("faithfulness"),
-                    "relevance": r.get("relevance"),
-                    "context_recall": r.get("context_recall"),
-                    "completeness": r.get("completeness"),
-                }
-                for r in rows
-            ],
-        }
-
-    result = {
-        "baseline": _compute_metrics(baseline_rows, "baseline_dense") if baseline_rows else {},
-        "variant": _compute_metrics(variant_rows, "variant_hybrid_query_transform") if variant_rows else {},
-    }
-    return result
-
-
 def compare_single_vs_multi(
     multi_traces_dir: str = "artifacts/traces",
     day08_results_file: Optional[str] = None,
 ) -> dict:
     """
     So sánh Day 08 (single agent RAG) vs Day 09 (multi-agent).
-    Tự động đọc dữ liệu thực từ lab08/results/ab_comparison.csv.
+
+    TODO Sprint 4: Điền kết quả thực tế từ Day 08 vào day08_baseline.
 
     Returns:
         dict của comparison metrics
     """
     multi_metrics = analyze_traces(multi_traces_dir)
 
-    # ─── Load Day 08 results thực tế từ lab08 ───
-    # Ưu tiên: day08_results_file > auto-detect lab08 CSV
-    day08_csv = None
-    day08_data = {}
+    # TODO: Load Day 08 results nếu có
+    # Nếu không có, dùng baseline giả lập để format
+    day08_baseline = {
+        "total_questions": 15,
+        "avg_confidence": 0.0,          # TODO: Điền từ Day 08 eval.py
+        "avg_latency_ms": 0,            # TODO: Điền từ Day 08
+        "abstain_rate": "?",            # TODO: Điền từ Day 08
+        "multi_hop_accuracy": "?",      # TODO: Điền từ Day 08
+    }
 
     if day08_results_file and os.path.exists(day08_results_file):
-        day08_csv = day08_results_file
-    else:
-        # Auto-detect: tìm ab_comparison.csv từ lab08
-        candidates = [
-            os.path.join(os.path.dirname(__file__), "..", "lab08", "results", "ab_comparison.csv"),
-            os.path.join(os.path.dirname(__file__), "data", "day08_results.csv"),
-        ]
-        for c in candidates:
-            if os.path.exists(c):
-                day08_csv = c
-                break
-
-    if day08_csv:
-        print(f"📂 Loading Day 08 results từ: {day08_csv}")
-        day08_data = _load_day08_from_csv(day08_csv)
-    else:
-        print("⚠️  Không tìm thấy Day 08 results. Dùng dữ liệu placeholder.")
-
-    day08_baseline = day08_data.get("baseline", {})
-    day08_variant = day08_data.get("variant", {})
-
-    # ─── Build comparison ───
-    # Tính delta giữa Day 08 (best variant) vs Day 09
-    d08_faith = day08_variant.get("avg_faithfulness") or day08_baseline.get("avg_faithfulness")
-    d08_relev = day08_variant.get("avg_relevance") or day08_baseline.get("avg_relevance")
-    d08_compl = day08_variant.get("avg_completeness") or day08_baseline.get("avg_completeness")
-
-    d09_conf = multi_metrics.get("avg_confidence", 0)
-    d09_latency = multi_metrics.get("avg_latency_ms", 0)
+        with open(day08_results_file, encoding="utf-8") as f:
+            day08_baseline = json.load(f)
 
     comparison = {
         "generated_at": datetime.now().isoformat(),
-        "day08_single_agent": {
-            "baseline": day08_baseline,
-            "variant": day08_variant,
-        },
+        "day08_single_agent": day08_baseline,
         "day09_multi_agent": multi_metrics,
         "analysis": {
-            "architecture": "Day 08 = single-agent pipeline (query→retrieve→generate). "
-                            "Day 09 = multi-agent supervisor-worker (supervisor→route→worker→synthesis).",
-            "routing_visibility": "Day 09 có supervisor_route + route_reason cho từng câu → dễ debug. "
-                                  "Day 08 không có routing, mọi câu đi qua cùng 1 pipeline.",
-            "faithfulness_comparison": (
-                f"Day 08 baseline={day08_baseline.get('avg_faithfulness')}/5, "
-                f"variant={day08_variant.get('avg_faithfulness')}/5. "
-                f"Day 09 confidence={d09_conf:.3f} (scale khác, dùng worker self-assessment)."
-                if day08_baseline else "Không có dữ liệu Day 08."
-            ),
-            "completeness_comparison": (
-                f"Day 08 baseline={day08_baseline.get('avg_completeness')}/5, "
-                f"variant={day08_variant.get('avg_completeness')}/5. "
-                f"Day 09 tách policy + retrieval → answer chính xác hơn cho policy questions."
-                if day08_baseline else "Không có dữ liệu Day 08."
-            ),
-            "abstain_handling": (
-                f"Day 08 baseline abstain={day08_baseline.get('abstain_rate')}, "
-                f"variant abstain={day08_variant.get('abstain_rate')}. "
-                f"Day 09 HITL={multi_metrics.get('hitl_rate', 'N/A')} — route câu khó sang human_review."
-                if day08_baseline else "Không có dữ liệu Day 08."
-            ),
-            "latency_delta": (
-                f"Day 09 avg={d09_latency}ms — chậm hơn Day 08 do routing + MCP overhead, "
-                f"nhưng đổi lại có debuggability và extensibility."
-            ),
-            "debuggability": "Multi-agent: test từng worker độc lập, xem trace per-step. "
-                             "Single-agent: chỉ xem input/output cuối.",
-            "mcp_benefit": "Day 09 extend capability qua MCP (thêm tool không sửa core). "
-                           "Day 08 phải hard-code mọi logic vào rag_answer.py.",
+            "routing_visibility": "Day 09 có route_reason cho từng câu → dễ debug hơn Day 08",
+            "latency_delta": "TODO: Điền delta latency thực tế",
+            "accuracy_delta": "TODO: Điền delta accuracy thực tế từ grading",
+            "debuggability": "Multi-agent: có thể test từng worker độc lập. Single-agent: không thể.",
+            "mcp_benefit": "Day 09 có thể extend capability qua MCP không cần sửa core. Day 08 phải hard-code.",
         },
     }
 
@@ -454,6 +315,11 @@ def print_metrics(metrics: dict):
 
 
 if __name__ == "__main__":
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
     parser = argparse.ArgumentParser(description="Day 09 Lab — Trace Evaluation")
     parser.add_argument("--grading", action="store_true", help="Run grading questions")
     parser.add_argument("--analyze", action="store_true", help="Analyze existing traces")
