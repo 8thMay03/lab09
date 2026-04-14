@@ -14,6 +14,7 @@ Definition of Done Sprint 1:
 """
 
 import os
+import sys
 import json
 import re
 from pathlib import Path
@@ -354,7 +355,7 @@ def inspect_metadata_coverage(db_dir: Path = CHROMA_DB_DIR) -> None:
         import chromadb
 
         client = chromadb.PersistentClient(path=str(db_dir))
-        collection = client.get_collection("rag_lab")
+        collection = client.get_collection("day09_docs")
         results = collection.get(include=["metadatas"])
         metas = results.get("metadatas") or []
 
@@ -388,6 +389,11 @@ def inspect_metadata_coverage(db_dir: Path = CHROMA_DB_DIR) -> None:
 # =============================================================================
 
 if __name__ == "__main__":
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
     print("=" * 60)
     print("Sprint 1: Build RAG Index")
     print("=" * 60)
