@@ -17,6 +17,9 @@ Gọi độc lập để test:
 """
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
 
 WORKER_NAME = "synthesis_worker"
 
@@ -41,7 +44,7 @@ def _call_llm(messages: list) -> str:
         from openai import OpenAI
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4.1-mini",
             messages=messages,
             temperature=0.1,  # Low temperature để grounded
             max_tokens=500,
@@ -103,17 +106,17 @@ def _estimate_confidence(chunks: list, answer: str, policy_result: dict) -> floa
     if "Không đủ thông tin" in answer or "không có trong tài liệu" in answer.lower():
         return 0.3  # Abstain → moderate-low
 
-    scores_list = [(c.get("score", 0) or 0) for c in chunks]
-    top_scores = sorted(scores_list, reverse=True)[:3]
-    avg_top = sum(top_scores) / len(top_scores) if top_scores else 0.0
-    best = max(scores_list) if scores_list else 0.0
-    # Kết hợp điểm cao nhất và trung bình top-3 (tránh mọi chunk nhiễu kéo avg xuống ~0.1)
-    base = max(best, avg_top)
+    # Weighted average của chunk scores
+    if chunks:
+        avg_score = sum(c.get("score", 0) for c in chunks) / len(chunks)
+    else:
+        avg_score = 0
 
+    # Penalty nếu có exceptions (phức tạp hơn)
     exception_penalty = 0.05 * len(policy_result.get("exceptions_found", []))
 
-    confidence = min(0.95, max(0.0, base - exception_penalty))
-    return round(max(0.15, confidence), 2)
+    confidence = min(0.95, avg_score - exception_penalty)
+    return round(max(0.1, confidence), 2)
 
 
 def synthesize(task: str, chunks: list, policy_result: dict) -> dict:

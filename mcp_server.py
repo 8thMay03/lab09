@@ -141,11 +141,9 @@ def tool_search_kb(query: str, top_k: int = 3) -> dict:
     """
     try:
         # Try ChromaDB first
-        from chromadb import Client
-        from chromadb.config import Settings
-
-        client = Client(Settings(persist_directory="./chroma_db"))
-        collection = client.get_collection(name="kb_collection")
+        import chromadb
+        client = chromadb.PersistentClient(path="./chroma_db")
+        collection = client.get_collection(name="day09_docs")
 
         results = collection.query(
             query_texts=[query],
