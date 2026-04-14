@@ -263,7 +263,7 @@ def build_index(docs_dir: Path = DOCS_DIR, db_dir: Path = CHROMA_DB_DIR) -> None
 
     client = chromadb.PersistentClient(path=str(db_dir))
     collection = client.get_or_create_collection(
-        name="rag_lab",
+        name="day09_docs",
         metadata={"hnsw:space": "cosine"},
     )
 
@@ -321,7 +321,7 @@ def list_chunks(db_dir: Path = CHROMA_DB_DIR, n: int = 5) -> None:
         import chromadb
 
         client = chromadb.PersistentClient(path=str(db_dir))
-        collection = client.get_collection("rag_lab")
+        collection = client.get_collection("day09_docs")
         results = collection.get(limit=n, include=["documents", "metadatas"])
 
         docs = results.get("documents") or []

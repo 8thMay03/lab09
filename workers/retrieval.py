@@ -17,6 +17,13 @@ Gọi độc lập để test:
 
 import os
 import sys
+from dotenv import load_dotenv
+from pathlib import Path
+
+CHROMA_DB_DIR = Path(__file__).parent.parent / "chroma_db"
+
+
+load_dotenv()
 
 # ─────────────────────────────────────────────
 # Worker Contract (xem contracts/worker_contracts.yaml)
@@ -34,14 +41,14 @@ def _get_embedding_fn():
     TODO Sprint 1: Implement dùng OpenAI hoặc Sentence Transformers.
     """
     # Option A: Sentence Transformers (offline, không cần API key)
-    try:
-        from sentence_transformers import SentenceTransformer
-        model = SentenceTransformer("all-MiniLM-L6-v2")
-        def embed(text: str) -> list:
-            return model.encode([text])[0].tolist()
-        return embed
-    except ImportError:
-        pass
+    # try:
+    #     from sentence_transformers import SentenceTransformer
+    #     model = SentenceTransformer("all-MiniLM-L6-v2")
+    #     def embed(text: str) -> list:
+    #         return model.encode([text])[0].tolist()
+    #     return embed
+    # except ImportError:
+    #     pass
 
     # Option B: OpenAI (cần API key)
     try:
@@ -68,7 +75,7 @@ def _get_collection():
     TODO Sprint 2: Đảm bảo collection đã được build từ Step 3 trong README.
     """
     import chromadb
-    client = chromadb.PersistentClient(path="./chroma_db")
+    client = chromadb.PersistentClient(path=CHROMA_DB_DIR)
     try:
         collection = client.get_collection("day09_docs")
     except Exception:
