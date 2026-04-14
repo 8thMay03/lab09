@@ -1,9 +1,10 @@
 """
 graph.py — Supervisor Orchestrator
-Sprint 1: Implement AgentState, supervisor_node, route_decision và kết nối graph.
+Sprint 1–2: AgentState, supervisor_node, route_decision, graph nối workers thật.
 
 Kiến trúc:
-    Input → Supervisor → [retrieval_worker | policy_tool_worker | human_review] → synthesis → Output
+    Input → Supervisor → [retrieval_worker | policy_tool_worker | human_review]
+         → synthesis → Output
 
 Chạy thử:
     python graph.py
@@ -11,14 +12,17 @@ Chạy thử:
 
 import json
 import os
+import sys
 from datetime import datetime
-from typing import TypedDict, Literal, Optional
+from typing import Any, TypedDict, Literal, Optional
 
-# Uncomment nếu dùng LangGraph:
-# from langgraph.graph import StateGraph, END
+from workers.retrieval import run as retrieval_run
+from workers.policy_tool import run as policy_tool_run
+from workers.synthesis import run as synthesis_run
+
 
 # ─────────────────────────────────────────────
-# 1. Shared State — dữ liệu đi xuyên toàn graph
+# 1. Shared State
 # ─────────────────────────────────────────────
 
 class AgentState(TypedDict, total=False):
