@@ -45,18 +45,18 @@ def _get_embedding_fn():
     global _model
 
     # Option A: Sentence Transformers (offline, không cần API key)
-    try:
-        from sentence_transformers import SentenceTransformer
+    # try:
+    #     from sentence_transformers import SentenceTransformer
 
-        if _model is None:
-            print("🔄 Loading embedding model (once)...")
-            _model = SentenceTransformer("all-MiniLM-L6-v2")
+    #     if _model is None:
+    #         print("🔄 Loading embedding model (once)...")
+    #         _model = SentenceTransformer("all-MiniLM-L6-v2")
 
-        def embed(text: str) -> list:
-            return _model.encode([text])[0].tolist()
-        return embed
-    except ImportError:
-        pass
+    #     def embed(text: str) -> list:
+    #         return _model.encode([text])[0].tolist()
+    #     return embed
+    # except ImportError:
+    #     pass
 
     # Option B: OpenAI (cần API key)
     try:
@@ -70,11 +70,11 @@ def _get_embedding_fn():
         pass
 
     # Fallback: random embeddings cho test (KHÔNG dùng production)
-    import random
-    def embed(text: str) -> list:
-        return [random.random() for _ in range(384)]
-    print("⚠️  WARNING: Using random embeddings (test only). Install sentence-transformers.")
-    return embed
+    # import random
+    # def embed(text: str) -> list:
+    #     return [random.random() for _ in range(384)]
+    # print("⚠️  WARNING: Using random embeddings (test only). Install sentence-transformers.")
+    # return embed
 
 
 def _get_collection():

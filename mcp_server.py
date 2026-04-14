@@ -142,12 +142,15 @@ def tool_search_kb(query: str, top_k: int = 3) -> dict:
     try:
         # Try ChromaDB first
         import chromadb
+        from index import get_embedding
         client = chromadb.PersistentClient(path="./chroma_db")
         collection = client.get_collection(name="day09_docs")
+        query_embedding = get_embedding(query)
 
         results = collection.query(
-            query_texts=[query],
-            n_results=top_k
+            query_embeddings=[query_embedding],
+            n_results=top_k,
+            include=["documents", "metadatas", "distances"],
         )
 
         chunks = []
